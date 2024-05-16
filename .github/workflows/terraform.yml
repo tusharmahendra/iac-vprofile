@@ -5,12 +5,12 @@ on: # When to trigger the workflow
       - main
       - stage
     paths:
-      - terraform/**
+      - terraform/*
   pull_request:
     branches:
       - main
     paths:
-      - terraform/**
+      - terraform/*
 #setup env variables to store our secrets
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
