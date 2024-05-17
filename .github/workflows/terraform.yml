@@ -58,5 +58,23 @@ jobs:
 
        - name: Terraform plan status
          if: steps.plan.outcome == 'failure' 
-         run: exit 1     
+         run: exit 1
 
+       - name: Terraform apply only if branch is main and push event
+         id: apply
+         if: github.ref == 'refs/head/main' && github.event_name == 'push'
+         run: terraform apply -input=false -auto-approve -parallelism=1 planfile
+
+       - name: Configure AWS credentials and region
+         run: |
+           aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+           aws configure set region $AWS_REGION
+
+       - name: Fetch KubeConfig file on runner to execute kubectl commands
+         id: getconfig
+         run: aws eks update-kubeconfig --name $EKS_CLUSTER --region $AWS_REGION
+
+       - name: Run kubectl command to deploy manifest
+         if: steps.getconfig.outcome == 'success' && steps.apply.outcome == 'success'
+         run: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.3/deploy/static/provider/aws/deploy.yaml
