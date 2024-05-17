@@ -71,7 +71,7 @@ jobs:
            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
            aws configure set region $AWS_REGION
 
-       - name: Fetch KubeConfig file on runner to execute kubectl commands
+       - name: Fetch kubeconfig file on runner to execute kubectl commands
          id: getconfig
          run: aws eks update-kubeconfig --name $EKS_CLUSTER --region $AWS_REGION
 
